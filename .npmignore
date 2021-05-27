@@ -6,4 +6,5 @@
 /.eslintignore
 /.eslintrc
 /.mocharc.js
+/push-tag.cmd
 /yarn.lock
