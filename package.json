@@ -1,0 +1,29 @@
+{
+    "name": "af-echo",
+    "version": "0.0.1",
+    "description": "A highly specialized function library",
+    "main": "index.js",
+    "scripts": {
+        "test": "mocha --require @babel/register 'test/**/**spec.es6'"
+    },
+    "author": "Viacheslav Makarov <npmjs@bazilio.ru>",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Bazilio-san/af-echo.git"
+    },
+    "license": "ISC",
+    "files": [
+        "index.js"
+    ],
+    "devDependencies": {
+        "@babel/core": "^7.14.3",
+        "@babel/register": "^7.13.16",
+        "chai": "^4.3.4",
+        "eslint": "^7.27.0",
+        "eslint-config-airbnb-base": "^14.2.1",
+        "eslint-friendly-formatter": "^4.0.1",
+        "eslint-loader": "^4.0.2",
+        "eslint-plugin-import": "^2.23.3",
+        "mocha": "^8.4.0"
+    }
+}
