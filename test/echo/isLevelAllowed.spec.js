@@ -1,9 +1,5 @@
-// const config = require('config');
 const { expect } = require('chai');
 const echo = require('../../index');
-
-// const currentLevel = config.get('logger.level');
-// const { defaultLevel } = echo;
 
 function s (str) {
     return `${typeof str === 'string' ? `"${str}"` : `${str}`}`;
