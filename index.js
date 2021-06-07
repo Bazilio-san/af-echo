@@ -154,6 +154,7 @@ class Echo {
             'logger'
         ];
         this.process_debug = !!process.env.DEBUG;
+        this._lastLogMessage = null;
     }
 
     /**
@@ -217,11 +218,14 @@ class Echo {
         const color = this.c(options);
         if (consoleFunction === 'dir') {
             console.dir(msg);
+            this._lastLogMessage = msg;
         } else {
-            console.log(`${color}${this.UnderlineOff}${prefix}${color}${msg}${this.reset}`);
+            const logMessage = `${color}${this.UnderlineOff}${prefix}${color}${msg}${this.reset}`;
+            console.log(logMessage);
+            this._lastLogMessage = logMessage;
         }
         if (logger) {
-            logger.info(`${prefix}${msg.replace(/\[\d+m/g, '')}`);
+            logger.info(`${prefix}${msg.replace(/\[(\d+;)?\d+m/g, '')}`);
         }
     }
 
@@ -289,7 +293,7 @@ class Echo {
     }
 
     /**
-     * Удаляет ESC-gjcktljdfntkmyjcnb bp cnhjrb (для записи в лог)
+     * Удаляет ESC-последовательности из строки (для записи в лог)
      * @param {String} str
      * @returns {String}
      */
@@ -370,8 +374,11 @@ class Echo {
         const cTitle = title ? `\x1b[1m${title}: \x1b[21m` : '';
         if (consoleFunction === 'dir') {
             console.dir(msg);
+            this._lastLogMessage = msg;
         } else {
-            console.log(`${lb}${color}${this.UnderlineOff}${prefix}${color}${cTitle}${this.UnderlineOff}${color}${msg}${this.reset}`);
+            const logMessage = `${lb}${color}${this.UnderlineOff}${prefix}${color}${cTitle}${this.UnderlineOff}${color}${msg}${this.reset}`;
+            console.log(logMessage);
+            this._lastLogMessage = logMessage;
         }
         if (logger) {
             logger[this.strlevels[iLevel]](this.clrESC(`${prefix}${title}${prefix || title ? ': ' : ''}${msg}`));
@@ -522,13 +529,15 @@ class Echo {
             return;
         }
         stack = stack.trim();
-        const stackArr = stack.split(/[\r\n]+/).filter((v) => !!v.trim());
+        const stackArr = stack.split(/[\r\n]+/)
+            .filter((v) => !!v.trim());
         if (stackArr.length < 2) {
             return;
         }
         const line = stackArr.shift();
         const t = this;
-        const stackArr2 = stackArr.map(t.getCallStackFrameObj).filter((v) => !!v);
+        const stackArr2 = stackArr.map(t.getCallStackFrameObj)
+            .filter((v) => !!v);
         return [{ line }, ...stackArr2];
     }
 
@@ -548,7 +557,8 @@ class Echo {
                 return frame.line;
             }
             return `    at ${frame.func || '<>'} (${frame.file || ''}:${frame.row || 0}:${frame.col || 0})`.replace(' (:0:0)', '');
-        }).join('\n');
+        })
+            .join('\n');
     }
 
     /**
@@ -599,7 +609,16 @@ class Echo {
         }
         err.aProcessed = true;
 
-        const { lb = 0, nc, msg, thr, errorLogger, prefix, noStack = false, socket } = options;
+        const {
+            lb = 0,
+            nc,
+            msg,
+            thr,
+            errorLogger,
+            prefix,
+            noStack = false,
+            socket
+        } = options;
 
         let targetFrame;
 
@@ -689,7 +708,30 @@ class Echo {
     }
 
     g (msg) {
-        this.echo(msg, { colorNum: this.Green, bold: true });
+        this.echo(msg, {
+            colorNum: this.Green,
+            bold: true
+        });
+    }
+
+    getSilly ({ debugIDs, prefix = 'SILLY' }) {
+        const { colorBlue: cB, colorLBlue: cLB, colorCyan: cC, colorGreen: cG, colorMagenta: cM } = this;
+        if (debugIDs && typeof debugIDs === 'string') {
+            debugIDs = [debugIDs];
+        } else if (!Array.isArray(debugIDs)) {
+            debugIDs = [];
+        }
+        const isSilly = this.isLevelAllowed('silly') || [...debugIDs, '*'].some((v) => process.env.DEBUG === v);
+        return (msg) => {
+            if (!isSilly) {
+                return;
+            }
+            if (typeof msg === 'object') {
+                msg = Object.entries(msg).map(({ name, value }) => `${cC}${name}${cLB}=${cG}${typeof value === 'object' ? JSON.stringify(value) : value}`).join(`${cB}&${cG}`);
+            }
+            const pfx = `${cM}[${prefix}]${cG}`;
+            this.info(pfx, msg);
+        };
     }
 }
 
