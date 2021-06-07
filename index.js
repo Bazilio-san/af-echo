@@ -687,6 +687,10 @@ class Echo {
             throw err;
         }
     }
+
+    g (msg) {
+        this.echo(msg, { colorNum: this.Green, bold: true });
+    }
 }
 
 module.exports = new Echo();
