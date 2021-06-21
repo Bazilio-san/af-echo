@@ -721,13 +721,17 @@ class Echo {
         } else if (!Array.isArray(debugIDs)) {
             debugIDs = [];
         }
-        const isSilly = (!onlyEnv && this.isLevelAllowed('silly')) || [...debugIDs, '*'].some((v) => process.env.DEBUG === v);
+        const debugEnvs = (process.env.DEBUG || '').split(/[,; ]+/);
+        const isSilly = (!onlyEnv && this.isLevelAllowed('silly')) || [...debugIDs, '*'].some((v) => debugEnvs.includes(v));
         return (msg) => {
             if (!isSilly) {
                 return;
             }
             if (typeof msg === 'object') {
-                msg = Object.entries(msg).map(({ name, value }) => `${cC}${name}${cLB}=${cG}${typeof value === 'object' ? JSON.stringify(value) : value}`).join(`${cB}&${cG}`);
+                msg = Object.entries(msg).map(({
+                    name,
+                    value
+                }) => `${cC}${name}${cLB}=${cG}${typeof value === 'object' ? JSON.stringify(value) : value}`).join(`${cB}&${cG}`);
             }
             const pfx = `${cM}[${prefix}]${cG}`;
             this.info(pfx, msg);
