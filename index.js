@@ -719,14 +719,15 @@ class Echo {
         return (!onlyEnv && this.isLevelAllowed('silly')) || [...debugIDs, '*'].some((v) => debugEnvs.includes(v));
     }
 
-    getSilly ({ debugIDs, prefix = 'SILLY', onlyEnv = false }) {
+    getSilly ({ debugIDs, prefix = 'SILLY', onlyEnv = false, color }) {
         const { colorBlue: cB, colorLBlue: cLB, colorCyan: cC, colorGreen: cG, colorMagenta: cM } = this;
+        const prefixColor = color || cM;
         if (debugIDs && typeof debugIDs === 'string') {
             debugIDs = [debugIDs];
         } else if (!Array.isArray(debugIDs)) {
             debugIDs = [];
         }
-        const isSilly = this.isSilly({ debugIDs, onlyEnv })
+        const isSilly = this.isSilly({ debugIDs, onlyEnv });
         return (msg) => {
             if (!isSilly) {
                 return;
@@ -737,7 +738,7 @@ class Echo {
                     value
                 }) => `${cC}${name}${cLB}=${cG}${typeof value === 'object' ? JSON.stringify(value) : value}`).join(`${cB}&${cG}`);
             }
-            const pfx = `${cM}[${prefix}]${cG}`;
+            const pfx = `${prefixColor}[${prefix}]${cG}`;
             this.info(pfx, msg);
         };
     }
