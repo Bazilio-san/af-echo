@@ -714,14 +714,14 @@ class Echo {
         });
     }
 
-    getSilly ({ debugIDs, prefix = 'SILLY' }) {
+    getSilly ({ debugIDs, prefix = 'SILLY', onlyEnv = false }) {
         const { colorBlue: cB, colorLBlue: cLB, colorCyan: cC, colorGreen: cG, colorMagenta: cM } = this;
         if (debugIDs && typeof debugIDs === 'string') {
             debugIDs = [debugIDs];
         } else if (!Array.isArray(debugIDs)) {
             debugIDs = [];
         }
-        const isSilly = this.isLevelAllowed('silly') || [...debugIDs, '*'].some((v) => process.env.DEBUG === v);
+        const isSilly = (!onlyEnv && this.isLevelAllowed('silly')) || [...debugIDs, '*'].some((v) => process.env.DEBUG === v);
         return (msg) => {
             if (!isSilly) {
                 return;
