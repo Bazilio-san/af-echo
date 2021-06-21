@@ -714,6 +714,11 @@ class Echo {
         });
     }
 
+    isSilly ({ debugIDs, onlyEnv = false }) {
+        const debugEnvs = (process.env.DEBUG || '').split(/[,; ]+/);
+        return (!onlyEnv && this.isLevelAllowed('silly')) || [...debugIDs, '*'].some((v) => debugEnvs.includes(v));
+    }
+
     getSilly ({ debugIDs, prefix = 'SILLY', onlyEnv = false }) {
         const { colorBlue: cB, colorLBlue: cLB, colorCyan: cC, colorGreen: cG, colorMagenta: cM } = this;
         if (debugIDs && typeof debugIDs === 'string') {
@@ -721,8 +726,7 @@ class Echo {
         } else if (!Array.isArray(debugIDs)) {
             debugIDs = [];
         }
-        const debugEnvs = (process.env.DEBUG || '').split(/[,; ]+/);
-        const isSilly = (!onlyEnv && this.isLevelAllowed('silly')) || [...debugIDs, '*'].some((v) => debugEnvs.includes(v));
+        const isSilly = this.isSilly({ debugIDs, onlyEnv })
         return (msg) => {
             if (!isSilly) {
                 return;
